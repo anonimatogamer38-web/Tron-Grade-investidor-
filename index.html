@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grid // Cofrinho de Cotas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #050a12;
+    --bg-deep: #02040a;
+    --panel: #0b1626;
+    --panel-2: #0e1e33;
+    --line: rgba(90,242,255,0.16);
+    --cyan: #5af2ff;
+    --cyan-soft: #7fe9f7;
+    --cyan-dim: rgba(90,242,255,0.35);
+    --amber: #ff9f1c;
+    --amber-dim: rgba(255,159,28,0.35);
+    --text: #dff7ff;
+    --text-dim: #7fa3b5;
+    --danger: #ff4f6e;
+    --radius: 2px;
+  }
+  :root:not([data-theme="light"]){ color-scheme: dark; }
+  *{ box-sizing: border-box; }
+  html,body{
+    height:100%;
+    margin:0;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(90,242,255,0.10), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(90,242,255,0.035) 0px, rgba(90,242,255,0.035) 1px, transparent 1px, transparent 42px),
+      repeating-linear-gradient(90deg, rgba(90,242,255,0.035) 0px, rgba(90,242,255,0.035) 1px, transparent 1px, transparent 42px),
+      var(--bg-deep);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+  ::selection{ background: var(--cyan-dim); color:#001318; }
+
+  /* ---------- shell ---------- */
+  #app{ max-width: 640px; margin: 0 auto; padding: 22px 18px 60px; }
+
+  .brand{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding: 4px 2px 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 22px;
+  }
+  .brand h1{
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin:0;
+    color: var(--cyan-soft);
+    text-shadow: 0 0 12px rgba(90,242,255,0.55), 0 0 2px rgba(90,242,255,0.9);
+  }
+  .brand .sub{
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:'Rajdhani', sans-serif;
+    font-weight:600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--cyan-soft);
+    background: rgba(90,242,255,0.06);
+    border: 1px solid var(--cyan-dim);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    cursor:pointer;
+    transition: background .15s ease, box-shadow .15s ease, color .15s ease;
+  }
+  .btn:hover{ background: rgba(90,242,255,0.14); box-shadow: 0 0 16px rgba(90,242,255,0.35); }
+  .btn:focus-visible{ outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .btn.primary{ color:#031014; background: var(--cyan); border-color: var(--cyan); font-weight:700; }
+  .btn.primary:hover{ box-shadow: 0 0 22px rgba(90,242,255,0.7); }
+  .btn.ghost{ background: transparent; border-color: var(--line); color: var(--text-dim); }
+  .btn.ghost:hover{ color: var(--cyan-soft); border-color: var(--cyan-dim); box-shadow:none; }
+  .btn.danger{ color: var(--danger); border-color: rgba(255,79,110,0.45); background: rgba(255,79,110,0.06); }
+  .btn.danger:hover{ box-shadow: 0 0 16px rgba(255,79,110,0.4); }
+  .btn.block{ width:100%; }
+  .btn.small{ padding: 6px 10px; font-size: 12px; }
+
+  /* ---------- home list ---------- */
+  #view-home .toolbar{ display:flex; justify-content:flex-end; margin-bottom: 18px; }
+
+  .empty{
+    border: 1px dashed var(--line);
+    padding: 34px 20px;
+    text-align:center;
+    color: var(--text-dim);
+    font-size: 14px;
+    letter-spacing: .5px;
+  }
+  .empty b{ color: var(--cyan-soft); font-weight:600; }
+
+  .card-list{ display:flex; flex-direction:column; gap: 12px; }
+
+  .fii-card{
+    position:relative;
+    display:grid;
+    grid-template-columns: 62px 1fr auto;
+    align-items:center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, var(--panel), var(--bg-deep));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    cursor:pointer;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .1s ease;
+  }
+  .fii-card:hover{ border-color: var(--cyan-dim); box-shadow: 0 0 18px rgba(90,242,255,0.18); }
+  .fii-card:active{ transform: scale(0.995); }
+  .fii-card:focus-visible{ outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  .ring{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: conic-gradient(var(--cyan) calc(var(--pct) * 1%), rgba(90,242,255,0.10) 0);
+    filter: drop-shadow(0 0 6px rgba(90,242,255,0.35));
+  }
+  .ring::after{
+    content:'';
+    width:44px; height:44px; border-radius:50%;
+    background: var(--bg-deep);
+  }
+  .ring span{
+    position:absolute;
+    font-family:'Orbitron', sans-serif;
+    font-size: 12px;
+    color: var(--cyan-soft);
+  }
+  .ring-wrap{ position:relative; width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
+
+  .fii-info .name{
+    font-family:'Orbitron', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .fii-info .stats{
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    letter-spacing: .3px;
+  }
+  .fii-info .stats b{ color: var(--cyan-soft); font-weight:600; }
+  .fii-info .bar{
+    margin-top:8px;
+    height: 4px;
+    background: rgba(90,242,255,0.10);
+    border-radius: 2px;
+    overflow:hidden;
+  }
+  .fii-info .bar i{
+    display:block; height:100%;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
+    box-shadow: 0 0 8px rgba(90,242,255,0.7);
+    width: calc(var(--pct) * 1%);
+  }
+  .chev{ color: var(--text-dim); font-size: 18px; }
+
+  /* ---------- detail view ---------- */
+  #view-detail{ display:none; }
+  .detail-top{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 18px;
+  }
+  .detail-title{
+    font-family:'Orbitron', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: var(--cyan-soft);
+    text-shadow: 0 0 10px rgba(90,242,255,0.4);
+  }
+  .detail-actions{ display:flex; gap:8px; }
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 20px;
+  }
+  .stat-strip .cell{
+    background: var(--panel);
+    padding: 12px 8px;
+    text-align:center;
+  }
+  .stat-strip .cell .v{
+    font-family:'Orbitron', sans-serif;
+    font-size: 17px;
+    color: var(--cyan-soft);
+    text-shadow: 0 0 8px rgba(90,242,255,0.4);
+  }
+  .stat-strip .cell .v.warn{ color: var(--amber); text-shadow: 0 0 8px rgba(255,159,28,0.5); }
+  .stat-strip .cell .l{
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .grid-label{
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+    display:flex; justify-content:space-between;
+  }
+  .grid-label b{ color: var(--cyan-soft); }
+
+  .quota-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    gap: 5px;
+    padding: 12px;
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+  }
+  .quota-cell{
+    aspect-ratio: 1 / 1;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 9.5px;
+    color: rgba(90,242,255,0.35);
+    background: rgba(90,242,255,0.04);
+    border: 1px solid rgba(90,242,255,0.14);
+    cursor: pointer;
+    user-select:none;
+    transition: background .12s ease, box-shadow .12s ease, color .12s ease, transform .08s ease;
+  }
+  .quota-cell:hover{ border-color: var(--cyan-dim); }
+  .quota-cell:active{ transform: scale(0.9); }
+  .quota-cell.filled{
+    background: var(--cyan);
+    color: #031014;
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(90,242,255,0.85), inset 0 0 4px rgba(0,0,0,0.35);
+    font-weight:700;
+  }
+  .quota-cell.filled.pop{ animation: pop .22s ease; }
+  @keyframes pop{ 0%{ transform: scale(1.35); } 100%{ transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce){
+    .quota-cell.filled.pop{ animation: none; }
+  }
+
+  .hint{
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align:center;
+    letter-spacing: .3px;
+  }
+
+  /* ---------- modal ---------- */
+  .overlay{
+    position: fixed; inset: 0;
+    background: rgba(2,4,10,0.78);
+    backdrop-filter: blur(3px);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    width: 100%; max-width: 380px;
+    background: linear-gradient(180deg, var(--panel-2), var(--bg-deep));
+    border: 1px solid var(--cyan-dim);
+    box-shadow: 0 0 40px rgba(90,242,255,0.18);
+    padding: 22px;
+  }
+  .modal h2{
+    font-family:'Orbitron', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    color: var(--cyan-soft);
+    margin: 0 0 18px;
+  }
+  .field{ margin-bottom: 14px; }
+  .field label{
+    display:block;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .8px;
+    margin-bottom: 6px;
+  }
+  .field input{
+    width:100%;
+    background: rgba(90,242,255,0.05);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family:'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight:600;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+  }
+  .field input:focus{
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(90,242,255,0.3);
+  }
+  .field .err{ color: var(--danger); font-size: 11.5px; margin-top: 5px; display:none; }
+  .modal-actions{ display:flex; gap:10px; margin-top: 20px; }
+  .modal-actions .btn{ flex:1; }
+
+  .confirm-text{ font-size: 14px; color: var(--text); line-height:1.5; margin-bottom: 4px; }
+  .confirm-text b{ color: var(--amber); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="brand">
+    <div>
+      <h1>COFRINHO // FII GRID</h1>
+      <div class="sub">rastreador de cotas</div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="view-home">
+    <div class="toolbar">
+      <button class="btn primary" id="btn-new">+ novo cofrinho</button>
+    </div>
+    <div id="empty-state" class="empty" style="display:none;">
+      Nenhum cofrinho criado ainda.<br>
+      Toque em <b>+ novo cofrinho</b> para definir sua primeira meta de cotas.
+    </div>
+    <div id="card-list" class="card-list"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div id="view-detail">
+    <div class="detail-top">
+      <button class="btn ghost small" id="btn-back">&larr; voltar</button>
+      <div class="detail-actions">
+        <button class="btn ghost small" id="btn-edit">editar</button>
+        <button class="btn danger small" id="btn-delete">excluir</button>
+      </div>
+    </div>
+    <div class="detail-title" id="detail-name">—</div>
+    <div style="height:16px;"></div>
+
+    <div class="stat-strip">
+      <div class="cell"><div class="v" id="stat-meta">0</div><div class="l">META</div></div>
+      <div class="cell"><div class="v" id="stat-atual">0</div><div class="l">ATUAL</div></div>
+      <div class="cell"><div class="v warn" id="stat-falta">0</div><div class="l">FALTAM</div></div>
+      <div class="cell"><div class="v" id="stat-pct">0%</div><div class="l">CONCLUÍDO</div></div>
+    </div>
+
+    <div class="grid-label">
+      <span>cada quadro = 1 cota</span>
+      <span>toque para marcar/desmarcar</span>
+    </div>
+    <div class="quota-grid" id="quota-grid"></div>
+    <div class="hint">o preenchido representa o que você já tem — o resto ainda falta</div>
+  </div>
+
+</div>
+
+<!-- MODAL: novo / editar cofrinho -->
+<div class="overlay" id="overlay-form">
+  <div class="modal">
+    <h2 id="form-title">NOVO COFRINHO</h2>
+    <div class="field">
+      <label for="inp-name">nome do fundo (ex: MXRF11)</label>
+      <input id="inp-name" type="text" maxlength="40" placeholder="MXRF11">
+      <div class="err" id="err-name">informe um nome</div>
+    </div>
+    <div class="field">
+      <label for="inp-meta">meta de cotas</label>
+      <input id="inp-meta" type="number" min="1" max="2000" placeholder="100">
+      <div class="err" id="err-meta">informe uma meta válida (1 a 2000)</div>
+    </div>
+    <div class="field" id="field-atual">
+      <label for="inp-atual">cotas que você já tem hoje (opcional)</label>
+      <input id="inp-atual" type="number" min="0" placeholder="0">
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btn-cancel-form">cancelar</button>
+      <button class="btn primary" id="btn-save-form">salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: confirmar exclusão -->
+<div class="overlay" id="overlay-confirm">
+  <div class="modal">
+    <h2>EXCLUIR COFRINHO</h2>
+    <div class="confirm-text">Isso vai apagar <b id="confirm-name"></b> e todo o progresso marcado. Essa ação não pode ser desfeita.</div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btn-cancel-delete">cancelar</button>
+      <button class="btn danger" id="btn-confirm-delete">excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "tron-cofrinho-fii-v1";
+  var state = { piggies: [] };
+  var currentId = null;
+  var editingId = null;
+
+  function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(parsed && Array.isArray(parsed.piggies)) state = parsed;
+      }
+    }catch(e){ /* storage unavailable, start empty */ }
+  }
+
+  function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ /* best effort only */ }
+  }
+
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+  function getPiggy(id){
+    for(var i=0;i<state.piggies.length;i++){ if(state.piggies[i].id === id) return state.piggies[i]; }
+    return null;
+  }
+
+  function atualDe(p){
+    var c = 0;
+    for(var i=0;i<p.cells.length;i++){ if(p.cells[i]) c++; }
+    return c;
+  }
+
+  // ---------- render: home ----------
+  function renderHome(){
+    var list = document.getElementById('card-list');
+    var empty = document.getElementById('empty-state');
+    list.innerHTML = '';
+    if(state.piggies.length === 0){
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    state.piggies.forEach(function(p){
+      var atual = atualDe(p);
+      var falta = Math.max(0, p.meta - atual);
+      var pct = p.meta > 0 ? Math.round((atual / p.meta) * 100) : 0;
+
+      var card = document.createElement('div');
+      card.className = 'fii-card';
+      card.tabIndex = 0;
+      card.setAttribute('role','button');
+      card.style.setProperty('--pct', pct);
+
+      card.innerHTML =
+        '<div class="ring-wrap">' +
+          '<div class="ring" style="--pct:'+pct+'"></div>' +
+          '<span>'+pct+'%</span>' +
+        '</div>' +
+        '<div class="fii-info">' +
+          '<div class="name">'+escapeHtml(p.name)+'</div>' +
+          '<div class="stats"><b>'+atual+'</b> / '+p.meta+' cotas &nbsp;·&nbsp; faltam <b>'+falta+'</b></div>' +
+          '<div class="bar"><i style="--pct:'+pct+'"></i></div>' +
+        '</div>' +
+        '<div class="chev">&#8250;</div>';
+
+      card.addEventListener('click', function(){ openDetail(p.id); });
+      card.addEventListener('keydown', function(ev){
+        if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); openDetail(p.id); }
+      });
+      list.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ---------- render: detail ----------
+  function renderDetail(){
+    var p = getPiggy(currentId);
+    if(!p) return;
+    var atual = atualDe(p);
+    var falta = Math.max(0, p.meta - atual);
+    var pct = p.meta > 0 ? Math.round((atual / p.meta) * 100) : 0;
+
+    document.getElementById('detail-name').textContent = p.name;
+    document.getElementById('stat-meta').textContent = p.meta;
+    document.getElementById('stat-atual').textContent = atual;
+    document.getElementById('stat-falta').textContent = falta;
+    document.getElementById('stat-pct').textContent = pct + '%';
+
+    var grid = document.getElementById('quota-grid');
+    grid.innerHTML = '';
+    var frag = document.createDocumentFragment();
+    for(var i=0;i<p.meta;i++){
+      var cell = document.createElement('div');
+      cell.className = 'quota-cell' + (p.cells[i] ? ' filled' : '');
+      cell.textContent = (i+1);
+      cell.setAttribute('data-idx', i);
+      cell.setAttribute('role','button');
+      cell.setAttribute('tabindex','0');
+      cell.setAttribute('aria-pressed', p.cells[i] ? 'true' : 'false');
+      frag.appendChild(cell);
+    }
+    grid.appendChild(frag);
+  }
+
+  function toggleCell(idx, el){
+    var p = getPiggy(currentId);
+    if(!p) return;
+    p.cells[idx] = !p.cells[idx];
+    el.classList.toggle('filled', p.cells[idx]);
+    el.setAttribute('aria-pressed', p.cells[idx] ? 'true' : 'false');
+    if(p.cells[idx]){
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+    }
+    save();
+    var atual = atualDe(p);
+    var falta = Math.max(0, p.meta - atual);
+    var pct = p.meta > 0 ? Math.round((atual / p.meta) * 100) : 0;
+    document.getElementById('stat-atual').textContent = atual;
+    document.getElementById('stat-falta').textContent = falta;
+    document.getElementById('stat-pct').textContent = pct + '%';
+  }
+
+  document.getElementById('quota-grid').addEventListener('click', function(ev){
+    var cell = ev.target.closest('.quota-cell');
+    if(!cell) return;
+    toggleCell(parseInt(cell.getAttribute('data-idx'), 10), cell);
+  });
+  document.getElementById('quota-grid').addEventListener('keydown', function(ev){
+    if(ev.key !== 'Enter' && ev.key !== ' ') return;
+    var cell = ev.target.closest('.quota-cell');
+    if(!cell) return;
+    ev.preventDefault();
+    toggleCell(parseInt(cell.getAttribute('data-idx'), 10), cell);
+  });
+
+  // ---------- navigation ----------
+  function openDetail(id){
+    currentId = id;
+    document.getElementById('view-home').style.display = 'none';
+    document.getElementById('view-detail').style.display = 'block';
+    renderDetail();
+    window.scrollTo(0,0);
+  }
+  function openHome(){
+    currentId = null;
+    document.getElementById('view-detail').style.display = 'none';
+    document.getElementById('view-home').style.display = 'block';
+    renderHome();
+    window.scrollTo(0,0);
+  }
+  document.getElementById('btn-back').addEventListener('click', openHome);
+
+  // ---------- form modal (add / edit) ----------
+  var overlayForm = document.getElementById('overlay-form');
+  var inpName = document.getElementById('inp-name');
+  var inpMeta = document.getElementById('inp-meta');
+  var inpAtual = document.getElementById('inp-atual');
+  var fieldAtual = document.getElementById('field-atual');
+
+  function openForm(mode, id){
+    editingId = mode === 'edit' ? id : null;
+    document.getElementById('form-title').textContent = mode === 'edit' ? 'EDITAR COFRINHO' : 'NOVO COFRINHO';
+    document.getElementById('err-name').style.display = 'none';
+    document.getElementById('err-meta').style.display = 'none';
+    fieldAtual.style.display = mode === 'edit' ? 'none' : 'block';
+
+    if(mode === 'edit'){
+      var p = getPiggy(id);
+      inpName.value = p ? p.name : '';
+      inpMeta.value = p ? p.meta : '';
+      inpAtual.value = '';
+    } else {
+      inpName.value = '';
+      inpMeta.value = '';
+      inpAtual.value = '';
+    }
+    overlayForm.classList.add('open');
+    setTimeout(function(){ inpName.focus(); }, 50);
+  }
+  function closeForm(){ overlayForm.classList.remove('open'); }
+
+  document.getElementById('btn-new').addEventListener('click', function(){ openForm('new'); });
+  document.getElementById('btn-edit').addEventListener('click', function(){ openForm('edit', currentId); });
+  document.getElementById('btn-cancel-form').addEventListener('click', closeForm);
+  overlayForm.addEventListener('click', function(ev){ if(ev.target === overlayForm) closeForm(); });
+
+  document.getElementById('btn-save-form').addEventListener('click', function(){
+    var name = inpName.value.trim();
+    var meta = parseInt(inpMeta.value, 10);
+    var okName = name.length > 0;
+    var okMeta = !isNaN(meta) && meta >= 1 && meta <= 2000;
+
+    document.getElementById('err-name').style.display = okName ? 'none' : 'block';
+    document.getElementById('err-meta').style.display = okMeta ? 'none' : 'block';
+    if(!okName || !okMeta) return;
+
+    if(editingId){
+      var p = getPiggy(editingId);
+      p.name = name;
+      if(meta !== p.meta){
+        var newCells = new Array(meta).fill(false);
+        for(var i=0;i<Math.min(meta, p.cells.length);i++){ newCells[i] = p.cells[i]; }
+        p.cells = newCells;
+        p.meta = meta;
+      }
+      save();
+      closeForm();
+      if(currentId === editingId){ renderDetail(); } else { renderHome(); }
+    } else {
+      var atualStart = parseInt(inpAtual.value, 10);
+      if(isNaN(atualStart) || atualStart < 0) atualStart = 0;
+      atualStart = clamp(atualStart, 0, meta);
+      var cells = new Array(meta).fill(false);
+      for(var j=0;j<atualStart;j++){ cells[j] = true; }
+      state.piggies.push({ id: uid(), name: name, meta: meta, cells: cells });
+      save();
+      closeForm();
+      renderHome();
+    }
+  });
+
+  // ---------- delete confirm ----------
+  var overlayConfirm = document.getElementById('overlay-confirm');
+  document.getElementById('btn-delete').addEventListener('click', function(){
+    var p = getPiggy(currentId);
+    if(!p) return;
+    document.getElementById('confirm-name').textContent = p.name;
+    overlayConfirm.classList.add('open');
+  });
+  document.getElementById('btn-cancel-delete').addEventListener('click', function(){
+    overlayConfirm.classList.remove('open');
+  });
+  overlayConfirm.addEventListener('click', function(ev){ if(ev.target === overlayConfirm) overlayConfirm.classList.remove('open'); });
+  document.getElementById('btn-confirm-delete').addEventListener('click', function(){
+    state.piggies = state.piggies.filter(function(p){ return p.id !== currentId; });
+    save();
+    overlayConfirm.classList.remove('open');
+    openHome();
+  });
+
+  // ---------- init ----------
+  load();
+  renderHome();
+})();
+</script>
+</body>
+</html>
